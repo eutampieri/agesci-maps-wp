@@ -14,10 +14,10 @@
 add_filter( 'the_content', 'agesci_maps_append_to_post', 1 );
 wp_enqueue_style("agesci_maps_maplibre_style", "https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.css");
 
-function agesci_maps_get_map_single_location($lat, $lon) {
+function agesci_maps_get_map_markers($locs) {
     wp_enqueue_script("agesci_maps_maplibre", "https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.js");
     wp_enqueue_script("agesci_maps_pmtiles", "https://cdn.jsdelivr.net/npm/pmtiles@2.11.0/dist/index.min.js");
-    return "<div id=\"map\" style=\"height: 400px;\"></div>".'
+    return "<p><strong>Mappa</strong></p><div id=\"map\" style=\"height: 400px;\"></div>".'
   <script>
     window.addEventListener("load", function() {
     let mode = "light";
@@ -49,12 +49,18 @@ function agesci_maps_get_map_single_location($lat, $lon) {
         //myMap.fitBounds(myBounds);
         let nav = new maplibregl.NavigationControl();
         myMap.addControl(nav, "bottom-right");
-        let position = '.json_encode([$lon, $lat]).';
-        let marker = new maplibregl.Marker()
-            .setLngLat(position)
-            .addTo(myMap);
-        myMap.flyTo({center: position, zoom: 9});
-
+        let mapData = '.json_encode($locs).';
+        let positions = mapData.positions;
+        for(const position of positions) {
+            let marker = new maplibregl.Marker()
+                .setLngLat(position)
+                .addTo(myMap);
+        }
+        if(positions.length == 1) {
+            myMap.flyTo({center: positions[0], zoom: 9});
+        } else {
+            myMap.fitBounds(new maplibregl.LngLatBounds(mapData.bbox));
+        }
       })
     })});
   </script>
@@ -62,15 +68,37 @@ function agesci_maps_get_map_single_location($lat, $lon) {
 }
 
 function agesci_maps_append_to_post( $content ) {
+    global $wpdb;
 
+    $postID = get_post()->ID;
     // Check if we're inside the main loop in a single Post.
     if ( is_singular() && in_the_loop() && is_main_query() ) {
-        $meta = get_post_meta(get_post()->ID);
+        $meta = get_post_meta($postID);
         if(isset($meta["geo_latitude"])) {
             $lat = floatval($meta["geo_latitude"][0]);
             $lon = floatval($meta["geo_longitude"][0]);
-            return $content . agesci_maps_get_map_single_location($lat, $lon);
+            return $content . agesci_maps_get_map_markers(["positions" => [[$lon, $lat]]]);
         }
+    }
+    $query = $wpdb->prepare("SELECT p.ID, p.post_title, m.meta_key, m.meta_value FROM {$wpdb->prefix}posts p, {$wpdb->prefix}postmeta m WHERE p.post_parent = %d AND p.ID = m.post_id AND (m.meta_key = \"geo_latitude\" OR m.meta_key = \"geo_longitude\") ORDER BY p.ID, m.meta_key", $postID);
+    $results = $wpdb->get_results($query);
+    if(count($results) > 0) {
+        $markers = [];
+        foreach ($results as $result) {
+            if(!isset($markers[$result->ID])) {
+                $markers[$result->ID] = [null, null];
+            }
+            if($result->meta_key == "geo_longitude") {
+                $markers[$result->ID][0] = floatval($result->meta_value);
+            } else if($result->meta_key == "geo_latitude") {
+                $markers[$result->ID][1] = floatval($result->meta_value);
+            }
+        }
+        $points = array_values($markers);
+        return $content . agesci_maps_get_map_markers(["positions" => $points, "bbox" => [
+            [max(array_map(fn($value): float => $value[0], $points)) + 0.25, min(array_map(fn($value): float => $value[1], $points)) - 0.25],
+            [min(array_map(fn($value): float => $value[0], $points)) - 0.25, max(array_map(fn($value): float => $value[1], $points)) + 0.25]
+        ]]);
     }
 
     return $content;
