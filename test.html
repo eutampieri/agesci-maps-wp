@@ -1,67 +1,59 @@
-<html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <!--script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" integrity="sha512-puJW3E/qXDqYp9IfhAI54BJEaWIfloJ7JWs7OeD5i6ruC9JZL1gERT1wjtwXFlh7CjE7ZJ+/vcRZRkIYIb6p4g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <script src="https://unpkg.com/leaflet-hash@0.2.1/leaflet-hash.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/leaflet-edgebuffer@1.0.6/src/leaflet.edgebuffer.min.js"></script>
-        <script src="https://unpkg.com/protomaps-leaflet@1.24.0/dist/protomaps-leaflet.min.js"></script>
-        <!-- <script src="../dist/protomaps-leaflet.js"></script> -->
-<script src=" https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.js "></script>
-<link href=" https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.css " rel="stylesheet">
-<script src=" https://cdn.jsdelivr.net/npm/pmtiles@2.11.0/dist/index.min.js "></script>
-        <style>
-            body, #map {
-                height:100vh;
-                margin:0px;
-            }
-        </style>
-    </head>
-    <body>
-        <div id="map"></div> 
-<script>
-let mode = "light";
-if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-//    mode = "dark";
-}
-const protocol = new pmtiles.Protocol();
-maplibregl.addProtocol("pmtiles", protocol.tile);
-fetch(`${location.protocol}//${location.host}/wp-content/uploads/style.json`).then(x => x.json()).then(style => {
-const myMap = new maplibregl.Map({
-  hash: true,
-  container: "map",
-  style: {
-    version: 8,
-    glyphs: `${location.protocol}//${location.host}/wp-content/uploads/fonts/{fontstack}/{range}.pbf`,
-    sources: {
-      protomaps: {
-        type: "vector",
-        url: `pmtiles://${location.protocol}//${location.host}/wp-content/uploads/emiro.pmtiles`,
-        attribution:
-          '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
-      },
-    },
-    layers: style,
-  },
-});
-myMap.on("load", () => {
-  const myBounds = myMap.getSource("protomaps").bounds;
-  myMap.fitBounds(myBounds);
-let nav = new maplibregl.NavigationControl();
-myMap.addControl(nav, 'bottom-right');
-})});
-</script>
-        <!--script>
-            const map = L.map('map')
-            let hash = new L.Hash(map)
-            if (!window.location.hash) map.setView(new L.LatLng(44.493889, 11.342778),16)
-            var layer = protomapsL.leafletLayer({
-                url:'https://emiro.agesci.it/wp-content/uploads/emiro.pmtiles',
-                edgeBufferTiles: 2,
-                label_rules: protomapsL.Toner().label_rules
-            })
-            layer.addTo(map)
-        </script-->
-    </body>
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"
+    integrity="sha512-h9FcoyWjHcOcmEVkxOfTLnmZFWIH0iZhZT1H2TbOq55xssQGEJHEaIm+PgoUaZbRvQTNTluNOEfb1ZRy6D3BOw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src=" https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.js "></script>
+  <link href=" https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.css " rel="stylesheet">
+  <script src=" https://cdn.jsdelivr.net/npm/pmtiles@2.11.0/dist/index.min.js "></script>
+  <style>
+    body,
+    #map {
+      height: 100vh;
+      margin: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    let mode = "light";
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      // mode = "dark";
+    }
+    const protocol = new pmtiles.Protocol();
+    maplibregl.addProtocol("pmtiles", protocol.tile);
+    fetch(`${location.protocol}//${location.host}/wp-content/uploads/style.json`).then(x => x.json()).then(style => {
+      const myMap = new maplibregl.Map({
+        hash: true,
+        container: "map",
+        style: {
+          version: 8,
+          glyphs: `${location.protocol}//${location.host}/wp-content/uploads/fonts/{fontstack}/{range}.pbf`,
+          sources: {
+            protomaps: {
+              type: "vector",
+              url: `pmtiles://${location.protocol}//${location.host}/wp-content/uploads/emiro.pmtiles`,
+              attribution:
+                '<a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
+            },
+          },
+          layers: style,
+        },
+      });
+      myMap.on("load", () => {
+        const myBounds = myMap.getSource("protomaps").bounds;
+        myMap.fitBounds(myBounds);
+        let nav = new maplibregl.NavigationControl();
+        myMap.addControl(nav, 'bottom-right');
+      })
+    });
+  </script>
+</body>
+
 </html>
