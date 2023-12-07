@@ -11,6 +11,10 @@
  *
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 remove_filter( 'the_content', 'wpautop' );
 add_filter( 'the_content', 'agesci_maps_append_to_post', 1 );
 wp_enqueue_style("agesci_maps_maplibre_style", "https://cdn.jsdelivr.net/npm/maplibre-gl@3.5.1/dist/maplibre-gl.min.css");

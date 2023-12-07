@@ -1,6 +1,17 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+
 function detect_os_arch() {
-    return ["Linux", "x86_64"];
+	$os = PHP_OS;
+	$arch = null;
+	switch($os) {
+	case "Linux":
+		$uname_data = explode(" ", php_uname());
+		$arch = $uname_data[count($uname_data) - 1];
+	}
+	return [$os, $arch];
 }
 function ensure_pmtiles($path) {
     if(!is_file($path)) {
@@ -16,4 +27,3 @@ function ensure_pmtiles($path) {
         }
     }
 }
-echo exec("uname -a");
