@@ -1,6 +1,10 @@
 <?php
+if ( ! defined( 'ABSPATH' ) ) {
+        exit; // Exit if accessed directly
+}
+
 function get_regions() {
-	$folder = dirname(__FILE__)."/regioni";
+	$folder = dirname(dirname(__FILE__))."/regioni";
 	$result = [];
 	foreach(glob($folder."/*.json") as $file) {
 		$name = pathinfo($file, PATHINFO_FILENAME);
