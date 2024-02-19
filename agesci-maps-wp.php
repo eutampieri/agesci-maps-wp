@@ -57,7 +57,13 @@ function agesci_maps_get_map_markers($locs) {
         let mapData = '.json_encode($locs).';
         let positions = mapData.positions;
         for(const position of positions) {
-            let marker = new maplibregl.Marker().setLngLat(position.coords);
+            let marker;
+            if(position.colour !== undefined) {
+                marker = new maplibregl.Marker({color: position.colour});
+            } else {
+                marker = new maplibregl.Marker();
+            }
+            marker.setLngLat(position.coords);
             if(position.popup !== undefined) {
                 marker.setPopup(new maplibregl.Popup().setHTML(position.popup));
             }
